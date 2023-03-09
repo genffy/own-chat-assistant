@@ -3,8 +3,8 @@ import {
     ParsedEvent,
     ReconnectInterval,
 } from "eventsource-parser";
-import type { Dispatch, SetStateAction } from "react";
 import type { AxiosResponse } from 'axios'
+// copy from https://github.com/shengxinjing/email-helper/blob/main/utils/OpenAIStream.ts
 // server side
 export function StreamResponce<T>(res: AxiosResponse<T, any>) {
     let counter = 0;
@@ -23,8 +23,14 @@ export function StreamResponce<T>(res: AxiosResponse<T, any>) {
                     }
                     try {
                         const json = JSON.parse(data);
-                        // const text = json.choices[0].text;
-                        const text = json.choices[0].delta?.content || "";
+                        const _data = json.choices[0];
+                        // text
+                        let text;
+                        if (_data.text !== undefined) { // CreateCompletionResponse
+                            text = _data.text;
+                        } else if (_data.delta) { // CreateChatCompletionResponse
+                            text = _data.delta?.content || "";
+                        }
                         if (counter < 2 && (text.match(/\n/) || []).length) {
                             // this is a prefix character (i.e., "\n\n"), do nothing
                             return;
@@ -42,20 +48,15 @@ export function StreamResponce<T>(res: AxiosResponse<T, any>) {
             // stream response (SSE) from OpenAI may be fragmented into multiple chunks
             // this ensures we properly read chunks and invoke an event for each SSE event stream
             const parser = createParser(onParse);
-            // https://web.dev/streams/#asynchronous-iteration
             // @ts-ignore
-            // for await (const chunk of res.body as any) {
-            //     parser.feed(decoder.decode(chunk));
-            // }
             res.data.on('data', data => {
-                // console.log(data);
                 parser.feed(decoder.decode(data));
             });
         },
     });
 }
 // client side
-export async function GetDataFromStreamResponse(res: Response, stateSetter: Dispatch<SetStateAction<string>>) {
+export async function GetDataFromStreamResponse(res: Response, handler: (value: string, status: boolean) => void) {
     if (!res.ok) {
         throw new Error(res.statusText);
     }
@@ -74,6 +75,7 @@ export async function GetDataFromStreamResponse(res: Response, stateSetter: Disp
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
-        stateSetter((prev: string) => prev + chunkValue);
+        console.log('chunkValue', chunkValue)
+        handler(chunkValue, done);
     }
 }
