@@ -4,7 +4,6 @@ import {
     ReconnectInterval,
 } from "eventsource-parser";
 import type { AxiosResponse } from 'axios'
-// copy from https://github.com/shengxinjing/email-helper/blob/main/utils/OpenAIStream.ts
 // server side
 export function StreamResponce<T>(res: AxiosResponse<T, any>) {
     let counter = 0;

@@ -76,7 +76,6 @@ export default function MessageHistory() {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      {/* ui from https://tailwindcomponents.com/component/chat */}
       <div className="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden">
         <div ref={messageWrapper} className="flex flex-col flex-grow h-0 p-4 overflow-auto">
           {
