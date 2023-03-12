@@ -3,7 +3,7 @@
 simple chatGpt demo for [How to use stream: true?](https://github.com/openai/openai-node/issues/18)
 
 - UI copy from [Simple chat component](https://tailwindcomponents.com/component/chat)
-- Stream processing util [stream-response](./src/utils/stream-response.util.ts) copy from [OpenAIStream.ts](https://github.com/shengxinjing/email-helper)
+- Stream processing util [stream-response](./src/utils/stream-response.util.ts) copy from [Building a GPT-3 app with Next.js and Vercel Edge Functions](https://vercel.com/blog/gpt-3-app-next-js-vercel-edge-functions)
 
 thanks all.
 
