@@ -3,11 +3,13 @@ import { GetDataFromStreamResponse } from '@/utils/stream-response.util'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
+
 type Message = {
   text: string
   timestamp: number
   type: string
 }
+
 export default function MessageHistory() {
   const [messages, setMessages] = useState<Message[]>([])
   const [message, setMessage] = useState('')
@@ -35,7 +37,7 @@ export default function MessageHistory() {
     updateScoller()
     try {
       setDisable(true);
-      const response = await fetch('/api/hello', {
+      const response = await fetch('/api/chat', {
         method: "POST",
         body: JSON.stringify({
           message,
