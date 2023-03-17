@@ -1,10 +1,10 @@
 
 export default function ChangeApi({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    return (
-        <div></div>
-    )
+  return (
+    <div></div>
+  )
 }

@@ -4,6 +4,7 @@ simple chatGpt demo for [How to use stream: true?](https://github.com/openai/ope
 
 - UI copy from [Simple chat component](https://tailwindcomponents.com/component/chat)
 - Stream processing util [stream-response](./src/utils/stream-response.util.ts) copy from [OpenAIStream.ts](https://github.com/shengxinjing/email-helper)
+- IconFont from [fontawesome](https://fontawesome.com/search?o=r&m=free&s=regular&f=classic)
 
 thanks all.
 
