@@ -1,11 +1,6 @@
-import React, { useState } from 'react';
-import { useForm } from '@mantine/form';
-import { IconLock, IconAt } from '@tabler/icons-react';
+import React, { useState } from "react";
 import {
-  TextInput,
-  PasswordInput,
   Group,
-  Checkbox,
   Button,
   Paper,
   Text,
@@ -15,9 +10,10 @@ import {
   Drawer,
   Burger,
   Select,
-} from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { OPENAI_API_CONFIG } from '@/constants';
+} from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { OPENAI_API_CONFIG, OPENAI_API_CONFIG_PARAMS_TYPE, OPENAI_API_TYPE } from "@/constants";
+import ExtraForm from "./_extra-form";
 
 export interface AuthenticationFormProps {
   noShadow?: boolean;
@@ -26,56 +22,42 @@ export interface AuthenticationFormProps {
   style?: React.CSSProperties;
 }
 
-export default function AdjustParam({
-  noShadow,
-  noPadding,
-  noSubmit,
-  style,
-}: AuthenticationFormProps) {
+export default function AdjustParam({ noShadow, noPadding, noSubmit, style }: AuthenticationFormProps) {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(true);
-  const [formType, setFormType] = useState<'register' | 'login'>('register');
+  const [formType, setFormType] = useState<"register" | "login">("register");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const theme = useMantineTheme();
 
   const toggleFormType = () => {
-    setFormType((current) => (current === 'register' ? 'login' : 'register'));
-    setError('');
+    setFormType((current) => (current === "register" ? "login" : "register"));
+    setError("");
   };
 
-  const form = useForm({
-    initialValues: {
-      apiName: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      termsOfService: true,
-    },
+  const apis: OPENAI_API_TYPE[] = Object.keys(OPENAI_API_CONFIG) as OPENAI_API_TYPE[];
+  const [data, setData] = useState<Record<string, any>>({
+    api: apis[0],
   });
-
+  const [extraForms, setExtraForms] = useState<OPENAI_API_CONFIG_PARAMS_TYPE[]>(OPENAI_API_CONFIG[apis[0]]);
   const handleSubmit = () => {
     setLoading(true);
-    setError('');
+    setError("");
     setTimeout(() => {
       setLoading(false);
-      setError(
-        formType === 'register'
-          ? 'User with this email already exists'
-          : 'User with this email does not exist'
-      );
+      setError(formType === "register" ? "User with this email already exists" : "User with this email does not exist");
     }, 3000);
   };
 
-  const [apis, setApis] = useState(Object.keys(OPENAI_API_CONFIG).map(k => {
-    return {
-      value: k,
-      label: k
+  function onChangeHandle(val: string | number | OPENAI_API_TYPE, key: string) {
+    if (key === "api") {
+      setExtraForms(OPENAI_API_CONFIG[val as OPENAI_API_TYPE]);
+      // TODO clear all data
     }
-  }))
+    data[key] = val;
+    setData({ ...data });
+  }
 
-
+  const match = useMediaQuery("(max-width: 768px)");
   return (
     <>
       <Burger opened={drawerOpened} onClick={toggleDrawer} />
@@ -83,85 +65,53 @@ export default function AdjustParam({
         opened={drawerOpened}
         onClose={closeDrawer}
         // TODO condition size
-        size={"50%"}
-        padding="md"
-        title="Setting"
+        size={match ? "100%" : "50%"}
+        padding='md'
+        title='Setting'
         zIndex={1000000}
-        position="right">
+        position='right'
+      >
         <Paper
-          p={noPadding ? 0 : 'lg'}
-          shadow={noShadow ? undefined : 'sm'}
+          p={noPadding ? 0 : "lg"}
+          shadow={noShadow ? undefined : "sm"}
           style={style}
           sx={{
-            position: 'relative',
-            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+            position: "relative",
+            backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
           }}
         >
-          <form onSubmit={form.onSubmit(handleSubmit)}>
+          <form onSubmit={() => handleSubmit()}>
             <LoadingOverlay visible={loading} />
             <Select
-              mt="md"
+              mt='md'
               required
-              label="Choose Api want to use"
-              placeholder="Pick one"
+              label='Choose Api want to use'
+              placeholder='Pick one'
               data={apis}
+              value={data["api"]}
               maxDropdownHeight={400}
-              nothingFound="Nobody here"
-              {...form.getInputProps('apiName')}
+              nothingFound='Nothing here'
+              onChange={(val: string) => onChangeHandle(val, "api")}
             />
-
-            <TextInput
-              mt="md"
-              required
-              placeholder="Your email"
-              label="Email"
-              icon={<IconAt size={16} stroke={1.5} />}
-              {...form.getInputProps('email')}
-            />
-
-            <PasswordInput
-              mt="md"
-              required
-              placeholder="Password"
-              label="Password"
-              icon={<IconLock size={16} stroke={1.5} />}
-              {...form.getInputProps('password')}
-            />
-
-            {formType === 'register' && (
-              <PasswordInput
-                mt="md"
-                required
-                label="Confirm Password"
-                placeholder="Confirm password"
-                icon={<IconLock size={16} stroke={1.5} />}
-                {...form.getInputProps('confirmPassword')}
-              />
-            )}
-
+            {/* dymamic form render */}
+            <ExtraForm forms={extraForms} onChange={onChangeHandle} />
             {error && (
-              <Text color="red" size="sm" mt="sm">
+              <Text color='red' size='sm' mt='sm'>
                 {error}
               </Text>
             )}
 
             {!noSubmit && (
-              <Group position="apart" mt="xl">
-                <Anchor
-                  component="button"
-                  type="button"
-                  color="dimmed"
-                  onClick={toggleFormType}
-                  size="sm"
-                >
-                  {formType === 'register'
-                    ? 'Have an account? Login'
-                    : "Don't have an account? Register"}
+              <Group position='apart' mt='xl'>
+                <Anchor component='button' type='button' color='dimmed' onClick={toggleFormType} size='sm'>
+                  {formType === "register" ? "Have an account? Login" : "Don't have an account? Register"}
                 </Anchor>
                 <Group grow>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant='outline'>Cancel</Button>
 
-                  <Button color="blue" type="submit">Save</Button>
+                  <Button color='blue' type='submit'>
+                    Save
+                  </Button>
                 </Group>
               </Group>
             )}

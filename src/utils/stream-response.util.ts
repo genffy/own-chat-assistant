@@ -1,9 +1,5 @@
-import {
-  createParser,
-  ParsedEvent,
-  ReconnectInterval,
-} from "eventsource-parser";
-import type { AxiosResponse } from 'axios'
+import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+import type { AxiosResponse } from "axios";
 // server side
 export function StreamResponce<T>(res: AxiosResponse<T, any>) {
   let counter = 0;
@@ -25,9 +21,11 @@ export function StreamResponce<T>(res: AxiosResponse<T, any>) {
             const _data = json.choices[0];
             // text
             let text;
-            if (_data.text !== undefined) { // CreateCompletionResponse
+            if (_data.text !== undefined) {
+              // CreateCompletionResponse
               text = _data.text;
-            } else if (_data.delta) { // CreateChatCompletionResponse
+            } else if (_data.delta) {
+              // CreateChatCompletionResponse
               text = _data.delta?.content || "";
             }
             if (counter < 2 && (text.match(/\n/) || []).length) {
@@ -49,7 +47,7 @@ export function StreamResponce<T>(res: AxiosResponse<T, any>) {
       const parser = createParser(onParse);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      res.data.on('data', data => {
+      res.data.on("data", (data) => {
         parser.feed(decoder.decode(data));
       });
     },
@@ -75,7 +73,7 @@ export async function GetDataFromStreamResponse(res: Response, handler: (value: 
     const { value, done: doneReading } = await reader.read();
     done = doneReading;
     const chunkValue = decoder.decode(value);
-    console.log('chunkValue', chunkValue)
+    console.log("chunkValue", chunkValue);
     handler(chunkValue, done);
   }
 }
