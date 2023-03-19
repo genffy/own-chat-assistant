@@ -3,6 +3,6 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
-}
-
-module.exports = nextConfig
+};
+console.log(process.env.NODE_ENV);
+module.exports = nextConfig;
