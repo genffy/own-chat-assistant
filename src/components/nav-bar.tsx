@@ -1,14 +1,9 @@
-import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
 import { Drawer, Button } from "@mantine/core";
 import AdjustParam from "./adjust-param";
 
-type NavBarProps = {
-  done: () => void;
-  cancel: () => void;
-};
-export default function NavBar({ done, cancel }: NavBarProps) {
+export default function NavBar() {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>

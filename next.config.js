@@ -4,5 +4,5 @@ const nextConfig = {
     appDir: true,
   },
 };
-
+console.log(process.env.NODE_ENV);
 module.exports = nextConfig;

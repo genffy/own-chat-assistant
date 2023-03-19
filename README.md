@@ -5,15 +5,14 @@ simple chatGpt demo for [How to use stream: true?](https://github.com/openai/ope
 - UI copy from [Simple chat component](https://tailwindcomponents.com/component/chat)
 - Stream processing util [stream-response](./src/utils/stream-response.util.ts) copy from [OpenAIStream.ts](https://github.com/shengxinjing/email-helper)
 
-
 thanks all.
 
 ## TODOs
 
-- [ ] markdown format
+- [x] markdown format
 - [ ] support context
-- [ ] change api
-- [ ] change api params 
+- [x] change api
+- [x] change api params
 - [ ] download chats
 - [ ] copy content
 - [ ] select chats share(image)
@@ -29,5 +28,6 @@ npm run dev
 ```
 
 ## Usage
+
 Fork and deploy it to Vercel.
 Production environment variables `OPENAI_API_KEY` can be configured at [Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)

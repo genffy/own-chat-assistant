@@ -2,98 +2,138 @@
 
 import AdjustParam from "@/components/adjust-param";
 import Chats from "@/components/chats";
-import InputSender from "@/components/input-sender";
-import ToggleColorTheme from "@/components/toggle-color-theme";
-import { ChatMessage } from "@/types";
-import {
-  AppShell,
-  Header,
-  Group,
-  Box,
-  Burger,
-  Drawer,
-  Container,
-  useMantineTheme,
-  MediaQuery,
-  Aside,
-  Footer,
-} from "@mantine/core";
+import Head from "next/head";
+import { AppShell, Header, Group, Footer, Button, TextInput } from "@mantine/core";
 import { MantineLogo } from "@mantine/ds";
-import { useDisclosure } from "@mantine/hooks";
+import ColorThemeToggle from "@/components/toggle-color-theme";
+import { Message } from "@/types";
+import { GetDataFromStreamResponse } from "@/utils/stream-response.util";
 import { useState } from "react";
+import { IconSend } from "@tabler/icons-react";
+import { useLocalStorage } from "@mantine/hooks";
+import { LOCAL_OPENAI_PARAMS_KEY } from "@/constants";
 
-export default function HeaderMegaMenu() {
-  // avatar use https://en.gravatar.com/site/implement/images/
-  const cakeMessages: ChatMessage[] = [
-    {
-      timestamp: 1679043102292,
-      text: "Can be verified on any platform using docker",
+export default function Page() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [message, setMessage] = useState("");
+  const [disable, setDisable] = useState(false);
+  const [lsData] = useLocalStorage({
+    key: LOCAL_OPENAI_PARAMS_KEY,
+  });
+  let codeMark = "";
+  async function sendMessage() {
+    if (message.length === 0) {
+      alert("Please enter your message first.");
+      return;
+    }
+    messages.push({
       type: "input",
-      author: {
-        name: "测试",
-        image:
-          "https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144",
-      },
-    },
-    {
-      timestamp: 1679043102300,
-      text: "Your error message says permission denied, npm global installs must be given root privileges.",
-      type: "response",
-      author: {
-        name: "测试",
-        image: "https://www.gravatar.com/avatar/05b6d7cc7c662bf81e01b39254f88a49?d=identicon",
-      },
-    },
-    {
-      timestamp: 1679043102300,
-      text: `
-      Command was run with root privileges. I'm sure about that.
-      I've update the description so it's more obviously now
-      FYI https://askubuntu.com/a/700266/510172
-      `,
-      type: "input",
-      author: {
-        name: "测试",
-        image: "https://www.gravatar.com/avatar/05b6d7cc7c662bf81e01b39254f88a49?d=identicon",
-      },
-    },
-    {
-      timestamp: 1679043102300,
-      text: `Any updates on this issue? I'm getting the same error when trying to install devtools.Thanks`,
-      type: "response",
-      author: {
-        name: "测试",
-        image: "https://www.gravatar.com/avatar/05b6d7cc7c662bf81e01b39254f88a49?d=identicon",
-      },
-    },
-  ];
-  const theme = useMantineTheme();
+      text: message,
+      timestamp: Date.now(),
+    });
+    setMessages([...messages]);
+    try {
+      setDisable(true);
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          message,
+          ...JSON.parse(lsData),
+        }),
+      });
+      GetDataFromStreamResponse(response, (text, status) => {
+        // get last one, update text
+        const lastMsg = messages.slice(-1)[0];
+        if (messages.slice(-1)[0]) {
+          if (messages.slice(-1)[0].type === "input") {
+            messages.push({
+              type: "response",
+              text,
+              timestamp: Date.now(),
+            });
+          } else {
+            if (!codeMark) {
+              codeMark = text;
+            } else {
+              // code block end remove it
+              codeMark = "";
+            }
+            messages[messages.length - 1].text = `${lastMsg.text}${text}`;
+          }
+          setMessages([...messages]);
+        }
+        if (status) {
+          setDisable(false);
+          setMessage("");
+        }
+      });
+    } catch (err) {
+      setDisable(false);
+    }
+  }
+  function submitHandle() {
+    sendMessage();
+  }
+
   return (
-    <AppShell
-      styles={{
-        main: {
-          background: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
-        },
-      }}
-      navbarOffsetBreakpoint='sm'
-      asideOffsetBreakpoint='sm'
-      footer={
-        <Footer height={100} p='md'>
-          <InputSender />
-        </Footer>
-      }
-      header={
-        <Header height={60} px='md'>
-          <Group position='apart' sx={{ height: "100%" }}>
-            {/* TODO design log */}
-            <MantineLogo size={30} />
-            {/* <ToggleColorTheme></ToggleColorTheme> */}
-            <AdjustParam></AdjustParam>
-          </Group>
-        </Header>
-      }
-    >
-      <Chats messages={cakeMessages}></Chats>
-    </AppShell>
+    <>
+      <Head>
+        <title>Message History - ChatGPT</title>
+        <meta name='description' content='View your message history with ChatGPT' />
+        <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+      </Head>
+      <AppShell
+        styles={(theme) => ({
+          main: {
+            height: "100vh",
+            backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
+          },
+        })}
+        header={
+          <Header height={60} px='md'>
+            <Group position='apart' sx={{ height: "100%" }}>
+              <MantineLogo type='mark' size={30} />
+              <Group>
+                <ColorThemeToggle></ColorThemeToggle>
+                <AdjustParam></AdjustParam>
+              </Group>
+            </Group>
+          </Header>
+        }
+        footer={
+          <Footer height={75} p='md'>
+            <TextInput
+              disabled={disable}
+              placeholder='Try typing some words...'
+              label=''
+              withAsterisk
+              value={message}
+              onChange={(event) => setMessage(event.currentTarget.value)}
+              rightSectionWidth={"7rem"}
+              rightSection={
+                <Button
+                  disabled={disable}
+                  fullWidth={true}
+                  uppercase={true}
+                  onClick={submitHandle}
+                  rightIcon={<IconSend />}
+                  styles={() => ({
+                    root: {
+                      height: "100%",
+                    },
+                  })}
+                >
+                  Send
+                </Button>
+              }
+            />
+          </Footer>
+        }
+      >
+        <Chats messages={messages} codeMark={codeMark}></Chats>
+      </AppShell>
+    </>
   );
 }

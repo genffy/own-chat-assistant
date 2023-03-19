@@ -1,7 +1,7 @@
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
 import type { AxiosResponse } from "axios";
 // server side
-export function StreamResponce<T>(res: AxiosResponse<T, any>) {
+export function StreamResponce<T>(res: AxiosResponse<T, unknown>) {
   let counter = 0;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -73,7 +73,6 @@ export async function GetDataFromStreamResponse(res: Response, handler: (value: 
     const { value, done: doneReading } = await reader.read();
     done = doneReading;
     const chunkValue = decoder.decode(value);
-    console.log("chunkValue", chunkValue);
     handler(chunkValue, done);
   }
 }

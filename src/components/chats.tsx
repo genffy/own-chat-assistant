@@ -1,105 +1,127 @@
-import { ChatMessage } from "@/types";
-import { Avatar, createStyles, rem, ScrollArea } from "@mantine/core";
-import Image from "next/image";
+import { Message } from "@/types";
+import {
+  Avatar,
+  createStyles,
+  Group,
+  Paper,
+  rem,
+  ScrollArea,
+  TypographyStylesProvider,
+  Text,
+  Center,
+} from "@mantine/core";
 import { useEffect, useRef } from "react";
-
-export type CahtsProps = {
-  messages: ChatMessage[];
-};
+import Markdown from "./markdown";
 
 const useStyles = createStyles((theme) => ({
+  comment: {
+    padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
+    marginBottom: theme.spacing.md,
+    "&:last-child": {
+      marginBottom: 0,
+    },
+  },
+  commentInput: {
+    padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
+    marginBottom: theme.spacing.md,
+    "&:last-child": {
+      marginBottom: 0,
+    },
+    backgroundColor: theme.colors.blue[5],
+  },
+
   body: {
     paddingLeft: rem(54),
     paddingTop: theme.spacing.sm,
+    fontSize: theme.fontSizes.sm,
+  },
+  bodyInput: {
+    paddingRight: rem(54),
+    paddingTop: theme.spacing.sm,
+    fontSize: theme.fontSizes.sm,
+  },
+
+  content: {
+    "& > p:last-child": {
+      marginBottom: 0,
+    },
+  },
+  contentInput: {
+    color: theme.colorScheme === "dark" ? theme.colors.dark[0] : "#fff",
   },
 }));
 
-export default function Chats({ messages }: CahtsProps) {
-  const messageWrapper = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    updateScoller();
-  }, [messages]);
-  function updateScoller() {
-    setTimeout(() => {
-      if (typeof messageWrapper.current?.scrollTop !== "undefined") {
-        // scroll to bottom
-        messageWrapper.current.scrollTop = messageWrapper.current.scrollHeight;
-      }
-    }, 100);
-  }
+interface CommentHtmlProps {
+  text: string;
+  type: string;
+}
+
+export function CommentHtml({ text, type }: CommentHtmlProps) {
   const { classes } = useStyles();
   return (
-    <ScrollArea h={1000}>
-      <div ref={messageWrapper}>
-        {messages.length === 0 ? (
-          <div className='flex flex-col justify-center justify-items-center h-screen'>
-            <Image width={48} height={48} src='/6598519.png' alt='content image' className='mx-auto' />
-            <p className='mt-8 text-lg font-semibold text-center text-gray-700 dark:text-gray-200'>
-              No chat messages, pls typing something :)
-            </p>
-          </div>
-        ) : (
-          messages.map((item, idx) => {
-            const key = `${item.type}-${idx}`;
-            const { author, timestamp } = item;
-            if (item.type === "input") {
-              return (
-                <div key={key} className='chat-message'>
-                  <div className='flex items-end'>
-                    <div className='flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start'>
-                      <div>
-                        <span className='px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600'>
-                          {item.text}
-                        </span>
-                      </div>
-                    </div>
-                    <Avatar src={author.image} alt={author.name} radius='xl' />
-                  </div>
-                  {/* <Group>
-                    <Avatar src={author.image} alt={author.name} radius="xl" />
-                    <div>
-                      <Text size="sm">{author.name}</Text>
-                      <Text size="xs" color="dimmed">
-                        {timestamp}
-                      </Text>
-                    </div>
-                  </Group>
-                  <Text className={classes.body} size="sm">
-                    {item.text}
-                  </Text> */}
-                </div>
-              );
-            } else {
-              return (
-                <div key={key} className='chat-message'>
-                  <div className='flex items-end justify-end'>
-                    <div className='flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end'>
-                      <div>
-                        <span className='px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white '>
-                          {item.text}
-                        </span>
-                      </div>
-                    </div>
-                    <Avatar src={author.image} alt={author.name} radius='xl' />
-                  </div>
-                  {/* <Group>
-                    <Avatar src={author.image} alt={author.name} radius="xl" />
-                    <div>
-                      <Text size="sm">{author.name}</Text>
-                      <Text size="xs" color="dimmed">
-                        {timestamp}
-                      </Text>
-                    </div>
-                  </Group>
-                  <Text className={classes.body} size="sm">
-                    {item.text}
-                  </Text> */}
-                </div>
-              );
+    <Paper withBorder radius='md' className={type === "input" ? classes.commentInput : classes.comment}>
+      <Group position={type === "input" ? "right" : "left"}>
+        {type === "input" ? null : (
+          <Avatar
+            src={
+              "https://images.unsplash.com/photo-1624298357597-fd92dfbec01d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=250&q=80"
             }
-          })
+            alt={"Jacob Warnhalter"}
+            radius='xl'
+          />
         )}
-      </div>
+        <TypographyStylesProvider className={type === "input" ? "" : classes.body}>
+          {type === "input" ? (
+            <div
+              className={type === "input" ? classes.contentInput : classes.content}
+              dangerouslySetInnerHTML={{ __html: text }}
+            />
+          ) : (
+            <Markdown content={text} />
+          )}
+        </TypographyStylesProvider>
+        {type !== "input" ? null : (
+          <Avatar
+            src={
+              "https://images.unsplash.com/photo-1624298357597-fd92dfbec01d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=250&q=80"
+            }
+            alt={"Jacob Warnhalter"}
+            radius='xl'
+          />
+        )}
+      </Group>
+    </Paper>
+  );
+}
+
+type CahtsProps = {
+  messages: Message[];
+  codeMark?: string;
+};
+
+export default function Chats({ messages, codeMark = "" }: CahtsProps) {
+  const viewport = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (typeof viewport.current?.scrollTop !== "undefined") {
+      viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  return messages.length === 0 ? (
+    <Center h='100%'>
+      <Text>No chat messages, pls typing something :)</Text>
+    </Center>
+  ) : (
+    <ScrollArea h='100%' viewportRef={viewport}>
+      {messages.map((item, idx) => {
+        const key = `${item.type}-${idx}`;
+        return <CommentHtml key={key} type={item.type} text={`${item.text + codeMark}`}></CommentHtml>;
+      })}
     </ScrollArea>
   );
 }

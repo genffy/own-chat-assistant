@@ -39,7 +39,7 @@ const BASE_COMMON: OPENAI_API_CONFIG_PARAMS_TYPE[] = [
     name: "top_p",
     type: "number",
     require: false,
-    step: 1,
+    step: 0.1,
     max: 1,
     min: 0,
     default: 1,
@@ -139,3 +139,5 @@ export const OPENAI_API_CONFIG: OPENAI_API_CONFIG_TYPE = {
     ...BASE_COMMON,
   ],
 };
+
+export const LOCAL_OPENAI_PARAMS_KEY = `openai_params_data_${process.env.NODE_ENV}`;
