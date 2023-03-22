@@ -3,6 +3,8 @@ import { Message } from "@/types";
 import Image from "next/image";
 import { GetDataFromStreamResponse } from "@/utils/stream-response.util";
 import { useEffect, useRef, useState } from "react";
+import { IconSend, IconLayoutSidebarLeftExpand, IconLayoutSidebarLeftCollapse, IconPlaystationX } from "@tabler/icons-react";
+import ConfigForm from "./component/config-form";
 
 export default function MessageHistory() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -63,10 +65,15 @@ export default function MessageHistory() {
       setDisable(false);
     }
   }
+  const [fold, setFold] = useState(false);
+  function toggleHandle() {
+    setFold(!fold);
+  }
   return (
-    <>
-      <div className='flex flex-col items-center justify-center w-screen min-h-screen bg-gray-100 text-gray-800 p-10'>
-        <div className='relative flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden'>
+    <div className={`h-screen w-full dark:bg-gray-800 grid grid-cols-[${fold ? "200px" : "1rem"}_1fr]`}>
+      {/* chat */}
+      <div className='flex flex-col items-center justify-center w-full min-h-screen bg-gray-100 text-gray-800 p-10'>
+        <div className='relative flex flex-col flex-grow w-full bg-white shadow-xl rounded-lg overflow-hidden'>
           <div ref={messageWrapper} className='flex flex-col flex-grow h-0 p-4 overflow-auto'>
             {messages.length === 0 ? (
               <div className='flex flex-col justify-center justify-items-center h-screen'>
@@ -112,7 +119,7 @@ export default function MessageHistory() {
                 sendMessage();
               }}
             >
-              <div className='mx-auto  flex items-center'>
+              <div className='mx-auto flex items-center'>
                 <input
                   disabled={disable}
                   type='text'
@@ -124,15 +131,16 @@ export default function MessageHistory() {
                 <button
                   disabled={disable || message.length === 0}
                   type='submit'
-                  className='bg-blue-600 text-white text-base font-semibold rounded-md shadow-md hover:bg-indigo-600 p-3'
+                  className='bg-blue-600 cursor-pointer flex justify-center items-center text-white text-base font-semibold rounded-md shadow-md hover:bg-indigo-600 p-3'
                 >
-                  Send
+                  Send &nbsp;<IconSend></IconSend>
                 </button>
               </div>
             </form>
           </div>
         </div>
       </div>
-    </>
+      <ConfigForm toggle={toggleHandle}></ConfigForm>
+    </div>
   );
 }
