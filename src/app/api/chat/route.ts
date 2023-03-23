@@ -1,5 +1,10 @@
 import { StreamResponce } from "@/utils/stream-response.util";
-import { Configuration, OpenAIApi, type CreateChatCompletionResponse, type CreateCompletionResponse } from "openai";
+import {
+  Configuration,
+  OpenAIApi,
+  type CreateChatCompletionResponse,
+  type CreateCompletionResponse,
+} from "openai";
 import { httpsOverHttp } from "tunnel";
 
 const tunnel = httpsOverHttp({

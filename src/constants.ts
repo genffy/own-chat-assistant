@@ -84,7 +84,14 @@ export const OPENAI_API_CONFIG: OPENAI_API_CONFIG_TYPE = {
       key: "model",
       name: "model",
       require: true,
-      options: ["gpt-4", "gpt-4-0314", "gpt-4-32k", "gpt-4-32k-0314", "gpt-3.5-turbo", "gpt-3.5-turbo-0301"],
+      options: [
+        "gpt-4",
+        "gpt-4-0314",
+        "gpt-4-32k",
+        "gpt-4-32k-0314",
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0301",
+      ],
       type: "select",
       default: "gpt-3.5-turbo",
       desc: `ID of the model to use. See the [model endpoint compatibility](https://platform.openai.com/docs/models/model-endpoint-compatibility) table for details on which models work with the Chat API.`,
@@ -139,5 +146,66 @@ export const OPENAI_API_CONFIG: OPENAI_API_CONFIG_TYPE = {
     ...BASE_COMMON,
   ],
 };
+export type AI_API_CONFIG_TYPE = {
+  baidu: AI_API_CONFIG_ITEM_TYPE;
+  openai: AI_API_CONFIG_ITEM_TYPE;
+  bing: AI_API_CONFIG_ITEM_TYPE;
+  bard: AI_API_CONFIG_ITEM_TYPE;
+  midjourney: AI_API_CONFIG_ITEM_TYPE;
+};
+export type AI_API_CONFIG_ITEM_TYPE = {
+  disabled: boolean;
+  name: string;
+  link: string;
+  icon: string;
+  // FIXME: any
+  config: any;
+  selected: boolean;
+};
+export type API_TYPE = keyof AI_API_CONFIG_TYPE;
+
+export const AI_API_CONFIG: AI_API_CONFIG_TYPE = {
+  baidu: {
+    disabled: true,
+    name: "ERNIE Bot",
+    link: "https://yiyan.baidu.com/",
+    icon: "/yiyan.png",
+    config: {},
+    selected: false,
+  },
+  openai: {
+    name: "OpenAi Chat",
+    link: "https://chat.openai.com/chat",
+    icon: "/apple-touch-icon.png",
+    config: OPENAI_API_CONFIG,
+    selected: true,
+    disabled: false,
+  },
+  bing: {
+    disabled: true,
+    name: "new Bing",
+    icon: "/new-bing.svg",
+    link: "https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx",
+    config: {},
+    selected: false,
+  },
+  midjourney: {
+    disabled: true,
+    name: "Midjourney",
+    link: "https://www.midjourney.com/home/",
+    icon: "/MJ_Favicon.png",
+    config: {},
+    selected: false,
+  },
+  bard: {
+    disabled: true,
+    name: "Bard",
+    icon: "/bard.svg",
+    link: "https://bard.google.com/",
+    config: {},
+    selected: false,
+  },
+};
 
 export const LOCAL_OPENAI_PARAMS_KEY = `openai_params_data_${process.env.NODE_ENV}`;
+export const LOCAL_TOGGLE_SETTING_FOLD = `toggle_setting_fold_${process.env.NODE_ENV}`;

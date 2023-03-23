@@ -54,7 +54,10 @@ export function StreamResponce<T>(res: AxiosResponse<T, unknown>) {
   });
 }
 // client side
-export async function GetDataFromStreamResponse(res: Response, handler: (value: string, status: boolean) => void) {
+export async function GetDataFromStreamResponse(
+  res: Response,
+  handler: (value: string, status: boolean) => void,
+) {
   if (!res.ok) {
     throw new Error(res.statusText);
   }

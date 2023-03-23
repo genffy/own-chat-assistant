@@ -51,7 +51,9 @@ export default function AdjustParam() {
       }
     } catch (e) {}
   }, [lsData]);
-  const [extraForms, setExtraForms] = useState<OPENAI_API_CONFIG_PARAMS_TYPE[]>(OPENAI_API_CONFIG[apis[0]]);
+  const [extraForms, setExtraForms] = useState<OPENAI_API_CONFIG_PARAMS_TYPE[]>(
+    OPENAI_API_CONFIG[apis[0]],
+  );
 
   const handleSubmit = () => {
     setLoading(true);
@@ -127,7 +129,12 @@ export default function AdjustParam() {
               </Text>
             )}
             <Group position='apart' mt='xl'>
-              <Anchor href='https://platform.openai.com/docs/api-reference' target='_blank' color='dimmed' size='sm'>
+              <Anchor
+                href='https://platform.openai.com/docs/api-reference'
+                target='_blank'
+                color='dimmed'
+                size='sm'
+              >
                 More details, api-reference
               </Anchor>
               <Group grow>

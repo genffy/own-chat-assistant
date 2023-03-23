@@ -88,7 +88,8 @@ export default function Page() {
         styles={(theme) => ({
           main: {
             height: "100vh",
-            backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
+            backgroundColor:
+              theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
           },
         })}
         header={

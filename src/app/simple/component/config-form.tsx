@@ -1,41 +1,30 @@
 import React, { useEffect, useState } from "react";
+import { Text } from "@mantine/core";
 import {
-  Text,
-} from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
-import {
+  AI_API_CONFIG,
+  API_TYPE,
   LOCAL_OPENAI_PARAMS_KEY,
+  LOCAL_TOGGLE_SETTING_FOLD,
   NUMBER_INPUT_TYPE,
   OPENAI_API_CONFIG,
   OPENAI_API_CONFIG_PARAMS_TYPE,
   OPENAI_API_TYPE,
   SELEC_INPUT_TYPE,
 } from "@/constants";
-import {
-  IconLayoutSidebarLeftCollapse,
-  IconLayoutSidebarLeftExpand,
-  IconPlaystationX,
-  IconTrash
-} from "@tabler/icons-react";
+import { IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from "@tabler/icons-react";
+import { useLocalStorage } from "react-use";
 
-type AdjustParamProps = {
-  toggle: () => void;
-};
-export default function AdjustParam({ toggle }: AdjustParamProps) {
-
+export default function AdjustParam() {
   const [error, setError] = useState<string>("");
 
   const apis: OPENAI_API_TYPE[] = Object.keys(OPENAI_API_CONFIG) as OPENAI_API_TYPE[];
   const [data, setData] = useState<Record<string, string | number>>({
     api: apis[0],
   });
-  const [lsData, setLsData] = useLocalStorage({
-    key: LOCAL_OPENAI_PARAMS_KEY,
-    defaultValue: JSON.stringify(data),
-  });
+  const [lsData, setLsData] = useLocalStorage(LOCAL_OPENAI_PARAMS_KEY, JSON.stringify(data));
   useEffect(() => {
     try {
-      if (Object.keys(lsData)) {
+      if (lsData && Object.keys(lsData)) {
         const _data = JSON.parse(lsData);
         if (_data.api) {
           const _forms = OPENAI_API_CONFIG[_data.api as OPENAI_API_TYPE];
@@ -45,7 +34,9 @@ export default function AdjustParam({ toggle }: AdjustParamProps) {
       }
     } catch (e) {}
   }, [lsData]);
-  const [extraForms, setExtraForms] = useState<OPENAI_API_CONFIG_PARAMS_TYPE[]>(OPENAI_API_CONFIG[apis[0]]);
+  const [extraForms, setExtraForms] = useState<OPENAI_API_CONFIG_PARAMS_TYPE[]>(
+    OPENAI_API_CONFIG[apis[0]],
+  );
 
   const handleSubmit = () => {
     setError("");
@@ -67,79 +58,136 @@ export default function AdjustParam({ toggle }: AdjustParamProps) {
       setData({ ...data });
     }
   }
+  // FIXME: bugs
+  const [fold, setFold] = useLocalStorage<boolean>(LOCAL_TOGGLE_SETTING_FOLD, false);
 
-  const [fold, setFold] = useState(true);
+  // platforms
+  const platforms = Object.keys(AI_API_CONFIG) as API_TYPE[];
 
-  function SideBarBtn() {
-    return (
+  return (
+    <div
+      className={`relative min-h-screen bg-gray-100 text-gray-800 ${!!fold ? "" : "w-[33.33%]"}`}
+    >
+      {/* side bar button */}
       <div
-        className={`absolute inset-y-0 -left-6 justify-center z-50 cursor-pointer text-gray-400 bg-transparent hover:text-gray-900 rounded-lg text-sm inline-flex items-center`}
+        className={`absolute inset-y-0 left-0 z-50 inline-flex w-10 cursor-pointer items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:text-gray-900`}
         onClick={() => {
           setFold(!fold);
-          toggle();
         }}
       >
         {fold ? <IconLayoutSidebarLeftExpand /> : <IconLayoutSidebarLeftCollapse />}
       </div>
-    );
-  }
-  return (
-    <>
-      <div className="relative w-full h-full bg-white dark:bg-gray-800">
-        <SideBarBtn />
-        <div className={`px-4 py-10 ${fold ? 'hidden' : 'block'}`}>
-          <h5 id="drawer-label" className="inline-flex items-center mb-6 text-sm font-semibold text-gray-500 uppercase dark:text-gray-400">Update Config</h5>
-          <button type="button" data-drawer-dismiss="drawer-update-product-default" aria-controls="drawer-update-product-default" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-            <IconPlaystationX></IconPlaystationX>
-            <span className="sr-only">Close menu</span>
-          </button>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
-          >
-            <div className="space-y-4">
-              <div key="api">
-                <label htmlFor="api" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Api</label>
-                <select id="api" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required
-                  key="api"
-                  placeholder='Pick one'
-                  defaultValue={data['api']}
-                  value={data["api"] as string}
-                  onChange={(e) => onChangeHandle(e.currentTarget.value, 'api')}
-                >
-                  {
-                    apis ? apis.map((k) => {
-                      return <option key={k} value={k}>{k}</option>
-                    }) : <>Nothing here</>
-                  }
-                </select>
+      <div
+        className={`relative flex h-full flex-col items-center justify-center py-10 pr-10 ${!!fold ? "" : "pl-10"
+          }`}
+      >
+        <div
+          className={`relative flex flex-grow flex-col overflow-hidden rounded-lg bg-white shadow-xl ${!!fold ? "w-0" : "w-full"
+            }`}
+        >
+          <header className='w-full bg-gray-300 p-4 text-center'>
+            <h1 className='text-2xl font-semibold'>Update Config</h1>
+          </header>
+          <main className='overflow-auto p-4'>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+            >
+              <div className='space-y-4'>
+                <div key='platform'>
+                  <label
+                    htmlFor='api'
+                    className='mb-2 block text-sm font-medium text-gray-900 dark:text-white'
+                  >
+                    Platform
+                  </label>
+                  <div className='flex flex-wrap'>
+                    {platforms.map((k) => {
+                      const item = AI_API_CONFIG[k];
+                      return (
+                        <div key={k} className='mr-4 flex items-center'>
+                          <input
+                            id={k}
+                            type='radio'
+                            value={k}
+                            disabled={item.disabled}
+                            checked={item.selected}
+                            name='inline-radio-group'
+                            className='h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
+                          />
+                          <label
+                            htmlFor={k}
+                            className='ml-2 text-sm font-medium text-gray-900 dark:text-gray-300'
+                          >
+                            {item.name}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div key='api'>
+                  <label
+                    htmlFor='api'
+                    className='mb-2 block text-sm font-medium text-gray-900 dark:text-white'
+                  >
+                    Api
+                  </label>
+                  <select
+                    id='api'
+                    className='focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-500 dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400'
+                    required
+                    key='api'
+                    placeholder='Pick one'
+                    defaultValue={data["api"]}
+                    value={data["api"] as string}
+                    onChange={(e) => onChangeHandle(e.currentTarget.value, "api")}
+                  >
+                    {apis ? (
+                      apis.map((k) => {
+                        return (
+                          <option key={k} value={k}>
+                            {k}
+                          </option>
+                        );
+                      })
+                    ) : (
+                      <>Nothing here</>
+                    )}
+                  </select>
+                </div>
+                {/* dymamic form render */}
+                <ExtraForm forms={extraForms} data={data} onChange={onChangeHandle} />
               </div>
-              {/* dymamic form render */}
-              <ExtraForm forms={extraForms} data={data} onChange={onChangeHandle} />
-            </div>
-            <div className="bottom-10 right-0 flex justify-center w-full pb-4 mt-4 space-x-4 sm:absolute sm:px-4 sm:mt-0">
-              <button type="button" className="w-full justify-center text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
-                <IconTrash></IconTrash> Cancel
-              </button>
-              <button type="submit" className="w-full justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Update
-              </button>
-            </div>
-            {error && (
-              <Text color='red' size='sm' mt='sm'>
-                {error}
-              </Text>
-            )}
-          </form>
+
+              {error && (
+                <Text color='red' size='sm' mt='sm'>
+                  {error}
+                </Text>
+              )}
+            </form>
+          </main>
+          <footer className='flex w-full justify-end bg-gray-300 p-4'>
+            <button
+              type='button'
+              className='mr-4 flex cursor-pointer items-center justify-center rounded-md bg-white p-3 font-semibold text-gray-800 shadow-md'
+            >
+              Rest
+            </button>
+            <button
+              type='submit'
+              className='flex cursor-pointer items-center justify-center rounded-md bg-blue-600 p-3 text-base font-semibold text-white shadow-md hover:bg-indigo-600'
+            >
+              Update
+            </button>
+          </footer>
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
 
 type RenderFormsProps = {
   forms: OPENAI_API_CONFIG_PARAMS_TYPE[];
@@ -155,10 +203,17 @@ export function ExtraForm({ forms, onChange, data }: RenderFormsProps) {
           const conf = rest as NUMBER_INPUT_TYPE;
           return (
             <div key={key}>
-              <label htmlFor={key} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              <label
+                htmlFor={key}
+                className='mb-2 block text-sm font-medium text-gray-900 dark:text-white'
+              >
                 {name}
               </label>
-              <input type="number" name={key} id={key} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              <input
+                type='number'
+                name={key}
+                id={key}
+                className='focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400'
                 required={require}
                 step={conf.step}
                 key={key}
@@ -175,8 +230,15 @@ export function ExtraForm({ forms, onChange, data }: RenderFormsProps) {
           const conf = rest as SELEC_INPUT_TYPE;
           return (
             <div key={key}>
-              <label htmlFor={key} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{name}</label>
-              <select id={key} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              <label
+                htmlFor={key}
+                className='mb-2 block text-sm font-medium text-gray-900 dark:text-white'
+              >
+                {name}
+              </label>
+              <select
+                id={key}
+                className='focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-500 dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400'
                 required={require}
                 key={key}
                 placeholder='Pick one'
@@ -184,11 +246,17 @@ export function ExtraForm({ forms, onChange, data }: RenderFormsProps) {
                 value={data[key] as string}
                 onChange={(e) => onChange(e.currentTarget.value, key)}
               >
-                {
-                  conf.options ? conf.options.map((k) => {
-                    return <option key={k} value={k}>{k}</option>
-                  }) : <>Nothing here</>
-                }
+                {conf.options ? (
+                  conf.options.map((k) => {
+                    return (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    );
+                  })
+                ) : (
+                  <>Nothing here</>
+                )}
               </select>
             </div>
           );

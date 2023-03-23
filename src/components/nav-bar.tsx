@@ -7,7 +7,7 @@ export default function NavBar() {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
-      <nav className='flex justify-end items-center bg-gray-800 px-4 py-3'>
+      <nav className='flex items-center justify-end bg-gray-800 px-4 py-3'>
         <Button className='text-gray-300 hover:text-white' onClick={open}>
           <IconAdjustments />
         </Button>

@@ -59,7 +59,11 @@ interface CommentHtmlProps {
 export function CommentHtml({ text, type }: CommentHtmlProps) {
   const { classes } = useStyles();
   return (
-    <Paper withBorder radius='md' className={type === "input" ? classes.commentInput : classes.comment}>
+    <Paper
+      withBorder
+      radius='md'
+      className={type === "input" ? classes.commentInput : classes.comment}
+    >
       <Group position={type === "input" ? "right" : "left"}>
         {type === "input" ? null : (
           <Avatar
@@ -120,7 +124,9 @@ export default function Chats({ messages, codeMark = "" }: CahtsProps) {
     <ScrollArea h='100%' viewportRef={viewport}>
       {messages.map((item, idx) => {
         const key = `${item.type}-${idx}`;
-        return <CommentHtml key={key} type={item.type} text={`${item.text + codeMark}`}></CommentHtml>;
+        return (
+          <CommentHtml key={key} type={item.type} text={`${item.text + codeMark}`}></CommentHtml>
+        );
       })}
     </ScrollArea>
   );
