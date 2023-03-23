@@ -1,4 +1,3 @@
-//model options:  https://platform.openai.com/docs/models/gpt-3
 interface BASE_INPUT_TYPE {
   key: string;
   name: string;
@@ -75,77 +74,89 @@ export type OPENAI_API_CONFIG_TYPE = {
   createCompletion: OPENAI_API_CONFIG_PARAMS_TYPE[];
 };
 
-export type OPENAI_API_TYPE = keyof OPENAI_API_CONFIG_TYPE;
+type OPENAI_API_TYPE = {
+  api: string;
+  doc: string;
+  selected: boolean;
+  params: OPENAI_API_CONFIG_PARAMS_TYPE[];
+}
 
-export const OPENAI_API_CONFIG: OPENAI_API_CONFIG_TYPE = {
-  // https://platform.openai.com/docs/api-reference/chat
-  createChatCompletion: [
-    {
-      key: "model",
-      name: "model",
-      require: true,
-      options: [
-        "gpt-4",
-        "gpt-4-0314",
-        "gpt-4-32k",
-        "gpt-4-32k-0314",
-        "gpt-3.5-turbo",
-        "gpt-3.5-turbo-0301",
-      ],
-      type: "select",
-      default: "gpt-3.5-turbo",
-      desc: `ID of the model to use. See the [model endpoint compatibility](https://platform.openai.com/docs/models/model-endpoint-compatibility) table for details on which models work with the Chat API.`,
-    },
-    {
-      key: "max_tokens",
-      name: "max_tokens",
-      type: "number",
-      require: false,
-      step: 10,
-      max: Number.MAX_VALUE,
-      min: 1,
-      default: 1024,
-      desc: `The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
-        The total length of input tokens and generated tokens is limited by the model's context length.`,
-    },
-    ...BASE_COMMON,
-  ],
-  // https://platform.openai.com/docs/api-reference/completions/create
-  createCompletion: [
-    {
-      require: true,
-      key: "model",
-      name: "model",
-      options: [
-        "text-davinci-003",
-        "text-davinci-002",
-        "text-curie-001",
-        "text-babbage-001",
-        "text-ada-001",
-        "davinci",
-        "curie",
-        "babbage",
-        "ada",
-      ],
-      type: "select",
-      default: "text-davinci-003",
-      desc: `ID of the model to use. You can use the [List models](https://platform.openai.com/docs/api-reference/models/list) API to see all of your available models, or see our [Model overview](https://platform.openai.com/docs/models/overview) for descriptions of them.`,
-    },
-    {
-      require: false,
-      key: "max_tokens",
-      name: "max_tokens",
-      type: "number",
-      step: 10,
-      max: 4096,
-      min: 16,
-      default: 1024,
-      desc: `The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the completion.
-      The token count of your prompt plus max_tokens cannot exceed the model's context length. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).`,
-    },
-    ...BASE_COMMON,
-  ],
-};
+const OPENAI_API_CONFIG: OPENAI_API_TYPE[] = [
+  {
+    api: 'createChatCompletion',
+    doc: 'https://platform.openai.com/docs/api-reference/chat',
+    selected: true,
+    params: [
+      {
+        key: "model",
+        name: "model",
+        require: true,
+        options: [
+          "gpt-4",
+          "gpt-4-0314",
+          "gpt-4-32k",
+          "gpt-4-32k-0314",
+          "gpt-3.5-turbo",
+          "gpt-3.5-turbo-0301",
+        ],
+        type: "select",
+        default: "gpt-3.5-turbo",
+        desc: `ID of the model to use. See the [model endpoint compatibility](https://platform.openai.com/docs/models/model-endpoint-compatibility) table for details on which models work with the Chat API.`,
+      },
+      {
+        key: "max_tokens",
+        name: "max_tokens",
+        type: "number",
+        require: false,
+        step: 10,
+        max: Number.MAX_VALUE,
+        min: 1,
+        default: 1024,
+        desc: `The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the chat completion.
+          The total length of input tokens and generated tokens is limited by the model's context length.`,
+      },
+      ...BASE_COMMON,
+    ]
+  }, {
+    api: 'createCompletion',
+    doc: 'https://platform.openai.com/docs/api-reference/completions/create',
+    selected: false,
+    params: [
+      {
+        require: true,
+        key: "model",
+        name: "model",
+        options: [
+          "text-davinci-003",
+          "text-davinci-002",
+          "text-curie-001",
+          "text-babbage-001",
+          "text-ada-001",
+          "davinci",
+          "curie",
+          "babbage",
+          "ada",
+        ],
+        type: "select",
+        default: "text-davinci-003",
+        desc: `ID of the model to use. You can use the [List models](https://platform.openai.com/docs/api-reference/models/list) API to see all of your available models, or see our [Model overview](https://platform.openai.com/docs/models/overview) for descriptions of them.`,
+      },
+      {
+        require: false,
+        key: "max_tokens",
+        name: "max_tokens",
+        type: "number",
+        step: 10,
+        max: 4096,
+        min: 16,
+        default: 1024,
+        desc: `The maximum number of [tokens](https://platform.openai.com/tokenizer) to generate in the completion.
+        The token count of your prompt plus max_tokens cannot exceed the model's context length. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).`,
+      },
+      ...BASE_COMMON,
+    ]
+  }
+];
 export type AI_API_CONFIG_TYPE = {
   baidu: AI_API_CONFIG_ITEM_TYPE;
   openai: AI_API_CONFIG_ITEM_TYPE;
@@ -153,27 +164,31 @@ export type AI_API_CONFIG_TYPE = {
   bard: AI_API_CONFIG_ITEM_TYPE;
   midjourney: AI_API_CONFIG_ITEM_TYPE;
 };
-export type AI_API_CONFIG_ITEM_TYPE = {
-  disabled: boolean;
+type AI_API_CONFIG_META_TYPE = {
+  platform: string;
   name: string;
   link: string;
   icon: string;
+}
+export interface AI_API_CONFIG_ITEM_TYPE extends AI_API_CONFIG_META_TYPE {
+  disabled: boolean;
   // FIXME: any
   config: any;
   selected: boolean;
 };
-export type API_TYPE = keyof AI_API_CONFIG_TYPE;
 
-export const AI_API_CONFIG: AI_API_CONFIG_TYPE = {
-  baidu: {
+export const AI_API_CONFIG: AI_API_CONFIG_ITEM_TYPE[] = [
+  {
+    platform: 'baidu',
     disabled: true,
     name: "ERNIE Bot",
     link: "https://yiyan.baidu.com/",
     icon: "/yiyan.png",
-    config: {},
+    config: [],
     selected: false,
   },
-  openai: {
+  {
+    platform: 'openai',
     name: "OpenAi Chat",
     link: "https://chat.openai.com/chat",
     icon: "/apple-touch-icon.png",
@@ -181,31 +196,76 @@ export const AI_API_CONFIG: AI_API_CONFIG_TYPE = {
     selected: true,
     disabled: false,
   },
-  bing: {
+  {
+    platform: 'bing',
     disabled: true,
     name: "new Bing",
     icon: "/new-bing.svg",
     link: "https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx",
-    config: {},
+    config: [],
     selected: false,
   },
-  midjourney: {
+  {
+    platform: 'midjourney',
     disabled: true,
     name: "Midjourney",
     link: "https://www.midjourney.com/home/",
     icon: "/MJ_Favicon.png",
-    config: {},
+    config: [],
     selected: false,
   },
-  bard: {
+  {
+    platform: 'bard',
     disabled: true,
     name: "Bard",
     icon: "/bard.svg",
     link: "https://bard.google.com/",
-    config: {},
+    config: [],
     selected: false,
   },
-};
+];
+
+export interface ApiFormDataType extends AI_API_CONFIG_META_TYPE {
+  api: string;
+  params: Record<string, string | number>;
+  config?: OPENAI_API_TYPE[];
+  extraForms?: OPENAI_API_CONFIG_PARAMS_TYPE[];
+}
+
+export function getFormData(p?: string, a?: string): ApiFormDataType {
+  // init data from default config
+  let selected;
+  if (p) {
+    selected = AI_API_CONFIG.filter(d => d.platform === p)[0];
+  }
+  if (!selected) {
+    selected = AI_API_CONFIG.filter(d => d.selected)[0];
+  }
+  const { platform, name, link, icon, config: apis } = selected;
+  let params
+  if (a) {
+    params = apis.filter((d: any) => d.api === a)[0];
+  }
+  if (!params || params.length === 0) {
+    params = apis.filter((d: any) => d.selected)[0] || {};
+  }
+  const { api, params: extraForms } = params;
+  // init data
+  const obj: ApiFormDataType = {
+    platform,
+    name,
+    link,
+    icon,
+    api,
+    params: {},
+    config: apis,
+    extraForms,
+  }
+    ; (extraForms || []).forEach((d: any) => {
+      obj.params[d.key] = d.default;
+    })
+  return obj;
+}
 
 export const LOCAL_OPENAI_PARAMS_KEY = `openai_params_data_${process.env.NODE_ENV}`;
 export const LOCAL_TOGGLE_SETTING_FOLD = `toggle_setting_fold_${process.env.NODE_ENV}`;

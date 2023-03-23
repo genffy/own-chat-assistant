@@ -2,13 +2,16 @@ import { Message } from "@/types";
 import { GetDataFromStreamResponse } from "@/utils/stream-response.util";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { IconSend } from "@tabler/icons-react";
+import { IconSend, IconExternalLink } from "@tabler/icons-react";
+import { type ApiFormDataType } from "@/constants";
+import Link from "next/link";
 
 type ChatsProps = {
   onSendMessage?: (message: string) => void;
+  meta: ApiFormDataType
 };
 
-export default function Chats({}: ChatsProps) {
+export default function Chats({ meta }: ChatsProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const [disable, setDisable] = useState(false);
@@ -68,10 +71,11 @@ export default function Chats({}: ChatsProps) {
     }
   }
   return (
-    <div className='flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 py-10 pl-10 text-gray-800'>
+    <div className='flex h-full w-full flex-col flex-1 items-center justify-center bg-gray-100 py-10 pl-10 text-gray-800'>
       <div className='relative flex w-full flex-grow flex-col overflow-hidden rounded-lg bg-white shadow-xl'>
-        <div className='w-full bg-gray-300 p-4 text-center'>
-          <h1 className='text-2xl font-semibold'>Chatbot</h1>
+        <div className='flex justify-center items-center gap-2 w-full bg-gray-300 p-4 text-center'>
+          {meta.icon && <Image src={meta.icon} alt={meta?.name} width={16} height={16}></Image>}<h1 className='text-2xl font-semibold'>{meta?.name}</h1>
+          {meta.link && <Link href={meta.link} target="_blank"><IconExternalLink /></Link>}
         </div>
         <div ref={messageWrapper} className='flex flex-grow flex-col overflow-auto p-4'>
           {messages.length === 0 ? (
@@ -83,7 +87,7 @@ export default function Chats({}: ChatsProps) {
                 alt='content image'
                 className='mx-auto'
               />
-              <p className='mt-8 text-center text-lg font-semibold text-gray-700 dark:text-gray-200'>
+              <p className='mt-8 text-center text-lg font-semibold text-gray-700 '>
                 No chat messages, pls typing something :)
               </p>
             </div>
