@@ -31,3 +31,8 @@ npm run dev
 
 Fork and deploy it to Vercel.
 Production environment variables `OPENAI_API_KEY` can be configured at [Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
+
+
+## Refs
+Thanks all.
+- https://github.com/mckaywrigley/chatbot-ui
